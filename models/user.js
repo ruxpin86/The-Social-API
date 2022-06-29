@@ -1,26 +1,55 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const { Thoughts, Reaction } = require('./index')
+const userSchema = new mongoose.Schema(
+  {
+    username: { type: String, Unique: true, Required: true },
 
-const userSchema = new mongoose.Schema({
-    username: { type: String, Unique: true, Require: true },
+    email: { type: String, Unique: true, Required: true },
 
-    email: { type: String, Unique: true, Require: true },
+    thoughts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Thought",
+      },
+    ],
 
-    // thoughts: [Thougts._id],
+    friends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+  },
+  {
+    toJSON: {
+      vitruals: true,
+    },
+    id: false,
+  }
+);
 
-    // friends: [User._id]
-})
+userSchema
+  .virtual("friendCount")
+  // Getter
+  .get(function () {
+    return this.friends.length;
+  });
 
-const User = mongoose.model('User', userSchema)
+const User = mongoose.model("User", userSchema);
 
-const handleError = (err) => console.error(err)
+const handleError = (err) => console.error(err);
 
-User.create(
-    {
-        username: "TSwift",
-        email: "ted@ted.com"
-    }
-)
+User.find({}).exec((err, collection) => {
+  if (collection.length === 0) {
+    User.insertMany(
+      [{ username: "TGlynn86", email: "ted@ted.com" }],
+      (insertErr) => {
+        if (insertErr) {
+          handleError(insertErr);
+        }
+      }
+    );
+  }
+});
 
-module.exports = User
+module.exports = User;
