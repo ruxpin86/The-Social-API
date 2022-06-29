@@ -44,29 +44,19 @@ router.post("/", async (req, res) => {
 //ADD A FRIEND
 router.post("/:id/friends/:friendId", async (req, res) => {
   try {
-    const addFriend = await User.findOne({
+    const currentUser = await User.findOne({
       _id: new ObjectId(req.params.id),
     });
-    addFriend.friends.push(new ObjectId(req.params.friendId));
-    await addFriend.save();
-    if (addFriend) {
-      res.status(200).json(addFriend);
+    currentUser.friends.push(new ObjectId(req.params.friendId));
+    await currentUser.save();
+    if (currentUser) {
+      res.status(200).json(currentUser);
     } else {
       console.log("Something went wrong");
       res.status(500).json({ message: "Something went wrong" });
     }
   } catch (err) {
     res.status(500).json(err);
-  }
-});
-
-//DELETE A FRIEND
-router.delete("/:id", async (req, res) => {
-  try {
-    const deleteUser = await User.deleteOne({ _id: req.params.id });
-    res.status(200).json(deleteUser);
-  } catch (err) {
-    res.status(500);
   }
 });
 
@@ -86,6 +76,16 @@ router.put("/:id", async (req, res) => {
     }
   } catch (err) {
     res.status(500).json(err);
+  }
+});
+
+//DELETE A FRIEND
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleteUser = await User.deleteOne({ _id: req.params.id });
+    res.status(200).json(deleteUser);
+  } catch (err) {
+    res.status(500);
   }
 });
 

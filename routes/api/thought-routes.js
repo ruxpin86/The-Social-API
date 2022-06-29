@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { Thought } = require("../../models/");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 //GET THOUGHTS
 router.get("/", async (req, res) => {
@@ -41,6 +42,24 @@ router.post("/", async (req, res) => {
 });
 
 //CREATE REACTION TO A THOUGHT
+router.post("/:thoughtId/reactions", async (req, res) => {
+  try {
+    const currentThought = await Thought.findOne({
+      _id: new ObjectId(req.params.thoughtId),
+    });
+    currentThought.reactions.push(req.body);
+    await currentThought.save();
+    if (currentThought) {
+      res.status(200).json(currentThought);
+    } else {
+      console.log("Something went wrong");
+      res.status(400).json({ message: "Something went wrong" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
 
 //UPDATE THOUGHT
 router.put("/:id", async (req, res) => {
@@ -58,6 +77,16 @@ router.put("/:id", async (req, res) => {
     }
   } catch (err) {
     res.status(500).json(err);
+  }
+});
+
+//DELETE REACTION
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleteReaction = await User.deleteOne({ _id: req.params.id });
+    res.status(200).json(deleteReaction);
+  } catch (err) {
+    res.status(500);
   }
 });
 
