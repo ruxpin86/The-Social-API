@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+//Create User model structure
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, Unique: true, Required: true },
@@ -28,6 +29,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+//Virtuals
 userSchema
   .virtual("friendCount")
   // Getter
@@ -39,6 +41,7 @@ const User = mongoose.model("User", userSchema);
 
 const handleError = (err) => console.error(err);
 
+//Seed a user to get started and test
 User.find({}).exec((err, collection) => {
   if (collection.length === 0) {
     User.insertMany(
@@ -52,4 +55,5 @@ User.find({}).exec((err, collection) => {
   }
 });
 
+//Export model
 module.exports = User;
