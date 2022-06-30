@@ -79,7 +79,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-//DELETE A FRIEND
+//DELETE A USER
 router.delete("/:id", async (req, res) => {
   try {
     const deleteUser = await User.deleteOne({ _id: req.params.id });
@@ -89,13 +89,24 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-//DELETE USER
+//DELETE FRIEND
 router.delete("/:id/friends/:friendId", async (req, res) => {
   try {
-    const deleteFriend = await User.deleteOne({ _id: req.params.id });
-    res.status(200).json(deleteFriend);
+    const deleteFriend = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $pull: { friends: ObjectId(req.params.friendId) } },
+      { runValidators: true, new: true }
+    );
+    await deleteFriend.save();
+    if (deleteFriend) {
+      res.status(200).json(deleteFriend);
+    } else {
+      res
+        .status(400)
+        .json({ message: "Could not remove friend with that ID." });
+    }
   } catch (err) {
-    res.status(500);
+    res.status(500).json(err);
   }
 });
 

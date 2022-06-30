@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Reaction = require("./Reaction");
+const reactionSchema = require("./Reaction");
 
 const thoughtSchema = new mongoose.Schema(
   {
@@ -22,7 +22,7 @@ const thoughtSchema = new mongoose.Schema(
       Required: true,
     },
 
-    reactions: [Reaction],
+    reactions: [reactionSchema],
   },
   {
     toJSON: {

@@ -81,12 +81,21 @@ router.put("/:id", async (req, res) => {
 });
 
 //DELETE REACTION
-router.delete("/:id", async (req, res) => {
+router.delete("/:thoughtId/reactions/:reactionId", async (req, res) => {
   try {
-    const deleteReaction = await User.deleteOne({ _id: req.params.id });
-    res.status(200).json(deleteReaction);
+    const deleteReaction = await Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $pull: { reactions: { reactionId: req.params.reactionId } } },
+      { runValidators: true, new: true }
+    );
+    await deleteReaction.save();
+    if (deleteReaction) {
+      res.status(200).json(deleteReaction);
+    } else {
+      res.status(400).json({ message: "Could not delete reaction." });
+    }
   } catch (err) {
-    res.status(500);
+    res.status(500).json(err);
   }
 });
 
